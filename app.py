@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -66,8 +67,7 @@ def handle_userinput(user_question):
 
 def main():
     load_dotenv()
-    st.set_page_config(page_title="StarAI",
-                       page_icon="⭐")
+    st.set_page_config(page_title="StarAI", page_icon="⭐")
     st.write(css, unsafe_allow_html=True)
 
     if "conversation" not in st.session_state:
@@ -77,8 +77,18 @@ def main():
 
     st.header("STAR AI: TARS")
     user_question = st.text_input("Ask a question about NASA Standards:")
-    if user_question:
+
+    processing = st.session_state.get("processing", False)
+    
+    if user_question and not processing:
+        st.warning("Please wait until processing is complete.")
+    elif user_question and processing:
+        st.warning("Processing is still ongoing. Please wait.")
+
+    if user_question and not processing:
+        st.session_state.processing = True
         handle_userinput(user_question)
+        st.session_state.processing = False
 
 
     #pdf_docs = st.file_uploader(
@@ -105,3 +115,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
